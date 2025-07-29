@@ -1,18 +1,19 @@
 {
   "name": "ecwid-recently-updated-widget",
+  "license": "MIT",
   "private": true,
   "workspaces": [
     "server",
     "client"
   ],
   "scripts": {
-    "dev": "concurrently \"yarn workspace server dev\" \"yarn workspace client dev\"",
+    "dev": "cross-env NODE_NO_WARNINGS=1 VITE_CJS_IGNORE_WARNING=true concurrently \"yarn workspace server dev\" \"yarn workspace client dev\"",
     "build": "yarn workspace server build && yarn workspace client build",
-    "start": "node dist/server/index.js",
-    "lint": "eslint . --ext .ts,.vue"
+    "start": "node dist/server/index.js"
   },
   "devDependencies": {
-    "concurrently": "8",
+    "concurrently": "^9.2.0",
+    "cross-env": "^7.0.3",
     "eslint": "^8.56.0",
     "eslint-plugin-vue": "^9.21.0",
     "typescript": "^5.4.2"
