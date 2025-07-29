@@ -1,0 +1,20 @@
+{
+  "name": "ecwid-recently-updated-widget",
+  "private": true,
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently \"yarn workspace server dev\" \"yarn workspace client dev\"",
+    "build": "yarn workspace server build && yarn workspace client build",
+    "start": "node dist/server/index.js",
+    "lint": "eslint . --ext .ts,.vue"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-vue": "^9.21.0",
+    "typescript": "^5.4.2"
+  }
+}
