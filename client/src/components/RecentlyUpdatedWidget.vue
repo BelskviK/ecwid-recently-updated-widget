@@ -1,112 +1,95 @@
 <template>
-  <div v-if="visible" class="ec-gallery ec-gallery--wide ec-mt-2">
-    <!-- header -->
-    <div
-      class="ec-gallery__header ec-mb-1 ec-flex ec-justify-between ec-items-center"
-    >
-      <h3 class="ec-text-h4">Recently updated products</h3>
+  <section class="a-card a-card--normal m-t-4">
+    <div class="a-card__paddings">
+      <div class="d-flex jc-space-between ai-center m-b-2">
+        <h3 class="text-lg">Recently updated products</h3>
 
-      <!-- dropdown -->
-      <select class="ec-select" v-model.number="count">
-        <option v-for="n in [3, 6, 9, 12]" :key="n" :value="n">{{ n }}</option>
-      </select>
-    </div>
-
-    <!-- products -->
-    <div class="ec-gallery__list">
-      <div
-        v-for="product in products"
-        :key="product.id"
-        class="ec-card ec-gallery__item"
-      >
-        <img
-          :src="product.thumbnailUrl"
-          :alt="product.name"
-          class="ec-gallery__image"
-          @click="openProduct(product)"
-        />
-
-        <h4 class="ec-card__title ec-mt-1" @click="openProduct(product)">
-          {{ product.name }}
-        </h4>
-
-        <p class="ec-card__price ec-mb-1">
-          {{ formatPrice(product.price, product.currency) }}
-        </p>
-
-        <button
-          class="ec-btn ec-btn--primary ec-btn--fluid"
-          @click="addToCart(product)"
-        >
-          Buy now
-        </button>
+        <select class="select select--small" v-model.number="count">
+          <option v-for="n in [3, 6, 9, 12]" :key="n" :value="n">
+            {{ n }}
+          </option>
+        </select>
       </div>
+
+      <div class="gallery gallery--wide">
+        <div
+          v-for="p in products"
+          :key="p.id"
+          class="gallery__item a-card a-card--hover"
+        >
+          <img
+            :src="p.thumbnailUrl"
+            :alt="p.name"
+            class="gallery__image"
+            @click="openProduct(p)"
+          />
+
+          <div class="a-card__content p-2">
+            <h4 class="text-base m-b-1" @click="openProduct(p)">
+              {{ p.name }}
+            </h4>
+            <p class="text-bold m-b-1">
+              {{ formatPrice(p.price, p.currency) }}
+            </p>
+            <button
+              class="btn btn-small btn-primary w-full"
+              @click="addToCart(p)"
+            >
+              Buy now
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <p v-if="loading" class="text-center m-t-2">Loading…</p>
+      <p v-if="error" class="text-center text-danger m-t-2">{{ error }}</p>
     </div>
-  </div>
+  </section>
 </template>
 
 <script setup lang="ts">
-/* ——— same script section you already have ——— */
-import { ref, watch, onMounted } from "vue";
-import axios from "axios";
+import { ref, onMounted, watch } from "vue";
+import { fetchRecentlyUpdated, EcwidProduct } from "@/api/ecwid";
 
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  currency: string;
-  thumbnailUrl: string;
-}
-
-const visible = ref(false);
-const count = ref<number>(Number(localStorage.getItem("ru-count")) || 6);
-const products = ref<Product[]>([]);
+const count = ref(Number(localStorage.getItem("ru-count")) || 6);
+const products = ref<EcwidProduct[]>([]);
+const loading = ref(false);
+const error = ref<string | null>(null);
 
 watch(count, () => {
   localStorage.setItem("ru-count", String(count.value));
-  loadProducts();
+  load();
 });
 
-onMounted(() => {
-  if (window.Ecwid?.initialized) {
-    ecwidPageListener(window.Ecwid.getCurrentPage());
+onMounted(load);
+
+async function load() {
+  loading.value = true;
+  error.value = null;
+  try {
+    products.value = await fetchRecentlyUpdated(count.value);
+  } catch {
+    error.value = "Unable to load products right now.";
+  } finally {
+    loading.value = false;
   }
-  document.addEventListener("ec-page-loaded", (e: any) =>
-    ecwidPageListener(e.detail)
-  );
-});
-
-function ecwidPageListener(page: any) {
-  visible.value = page.pageType === "CART";
-  if (visible.value) loadProducts();
 }
 
-function loadProducts() {
-  axios
-    .get("/api/products", {
-      params: { limit: count.value, sortBy: "updateDateDesc" },
-    })
-    .then((r) => (products.value = r.data.items));
-}
-
-function addToCart(product: Product) {
+function addToCart(p: EcwidProduct) {
   window.Ecwid?.Cart.addProduct(
-    product.id,
+    p.id,
     1,
     null,
-    [{ name: "recentlyUpdatedAdded", value: "true", hidden: true }],
+    [{ name: "FROM_RUP", value: "1", hidden: true }],
     () => window.Ecwid.openPage("cart")
   );
 }
 
-function openProduct(product: Product) {
-  window.Ecwid?.openPage(`product/${product.id}`);
-}
+const openProduct = (p: EcwidProduct) =>
+  window.Ecwid?.openPage(`product/${p.id}`);
 
-function formatPrice(price: number, currency: string) {
-  return new Intl.NumberFormat(undefined, {
-    style: "currency",
-    currency,
-  }).format(price);
-}
+const formatPrice = (price: number, currency: string) =>
+  new Intl.NumberFormat(undefined, { style: "currency", currency }).format(
+    price
+  );
 </script>

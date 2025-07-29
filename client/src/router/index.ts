@@ -1,11 +1,13 @@
-import { createRouter, createWebHistory } from "vue-router";
-import EcwidInstantSite from "@/views/EcwidInstantSite.vue";
-import SettingsPage from "@/views/SettingsPage.vue";
+import type { RouteRecordRaw } from "vue-router";
 
-export default createRouter({
-  history: createWebHistory(),
-  routes: [
-    { path: "/", component: EcwidInstantSite },
-    { path: "/settings", component: SettingsPage },
-  ],
-});
+import Products from "@/views/Products.vue";
+import Cart from "@/views/Cart.vue";
+import Settings from "@/views/Settings.vue";
+
+const routes: RouteRecordRaw[] = [
+  { path: "/", name: "Products", component: Products },
+  { path: "/cart", name: "Cart", component: Cart },
+  { path: "/settings", name: "Settings", component: Settings },
+];
+
+export default routes;

@@ -1,14 +1,14 @@
 <template>
   <div class="ec-card-stack ec-m-4">
-    <!-- Description -->
+    <!-- description ------------------------------------------------- -->
     <div class="ec-card">
       <div class="ec-card__section">
-        <h2 class="ec-text-h3 ec-mb-2">Recently Updated Products Widget</h2>
+        <h2 class="ec-text-h3 ec-mb-2">Recently-Updated Products Widget</h2>
         <p>Displays your most recently updated products on the cart page.</p>
       </div>
     </div>
 
-    <!-- Enable toggle -->
+    <!-- on/off toggle ------------------------------------------------ -->
     <div class="ec-card">
       <div class="ec-card__section ec-flex ec-justify-between ec-items-center">
         <label for="toggle">Enable widget for customers</label>
@@ -16,7 +16,7 @@
       </div>
     </div>
 
-    <!-- Default count -->
+    <!-- default count ------------------------------------------------ -->
     <div class="ec-card">
       <div class="ec-card__section ec-flex ec-justify-between ec-items-center">
         <label for="count">Default number of products</label>
@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <!-- Export -->
+    <!-- export table ------------------------------------------------- -->
     <div class="ec-card">
       <div class="ec-card__section">
         <h3 class="ec-text-h4 ec-mb-2">Export catalog</h3>
@@ -38,13 +38,7 @@
           <table class="ec-table ec-mb-2">
             <thead>
               <tr>
-                <th>
-                  <input
-                    type="checkbox"
-                    :checked="allSelected"
-                    @change="toggleAll"
-                  />
-                </th>
+                <th><input type="checkbox" @change="toggleAll" /></th>
                 <th>Name</th>
                 <th>Price</th>
                 <th>Updated</th>
@@ -76,7 +70,6 @@
 </template>
 
 <script setup lang="ts">
-/* ——— same script as you have, only import stays the same ——— */
 import { ref, computed, onMounted, watch } from "vue";
 import axios from "axios";
 import { unparse } from "papaparse";
@@ -117,9 +110,10 @@ async function exportSelected() {
   const csv = unparse(rows, { delimiter: "," });
   const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "products.csv";
+  const a = Object.assign(document.createElement("a"), {
+    href: url,
+    download: "products.csv",
+  });
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -129,21 +123,20 @@ async function loadProducts() {
     fetched: ProductRow[] = [],
     total = 0;
   do {
-    const { data } = await axios.get("/api/products", {
+    const { data } = await axios.get("http://localhost:3000/api/products", {
       params: { limit: 100, offset },
     });
-    total = data?.total ?? 0;
-    const items = data?.items ?? [];
+    total = data.total;
+    offset += 100;
     fetched = fetched.concat(
-      items.map((x: any) => ({
+      data.items.map((x: any) => ({
         id: x.id,
         name: x.name,
         price: x.price,
         currency: x.currency,
-        updated: x.updateDate,
+        updated: x.updateTimestamp * 1000,
       }))
     );
-    offset += 100;
   } while (fetched.length < total);
   products.value = fetched;
 }

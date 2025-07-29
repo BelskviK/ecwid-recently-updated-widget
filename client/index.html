@@ -2,27 +2,25 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Ecwid Store</title>
+    <title>Ecwid Recently-Updated Widget</title>
 
-    <!-- Ecwid storefront -->
-    <script
-      src="https://app.ecwid.com/script.js?101560752&data_platform=code&data_date=2025-07-29"
-      defer
-    ></script>
-
-    <!-- Ecwid CSS Framework -->
+    <!-- Ecwid App-UI framework -->
     <link
       rel="stylesheet"
-      href="https://d35z3p2poghz10.cloudfront.net/ecwid-sdk/css/2.0.0-alpha.0/ecwid-app-ui.css"
+      href="https://d35z3p2poghz10.cloudfront.net/ecwid-sdk/css/1.3.19/ecwid-app-ui.css"
     />
     <script
-      src="https://d35z3p2poghz10.cloudfront.net/ecwid-sdk/js/2.0.0-alpha.0/ecwid-app-ui.js"
       defer
+      src="https://d35z3p2poghz10.cloudfront.net/ecwid-sdk/css/1.3.19/ecwid-app-ui.min.js"
     ></script>
+
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
   </head>
-  <body>
+
+  <body class="normalized">
     <div id="app"></div>
+
+    <!-- Vite entry -->
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

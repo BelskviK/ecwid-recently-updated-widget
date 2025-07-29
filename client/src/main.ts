@@ -1,7 +1,8 @@
 import { createApp } from "vue";
-import App from "./App.vue";
-import router from "./router";
+import { createRouter, createWebHistory } from "vue-router";
+import routes from "@/router";
+import App from "./App.vue"; // 1-root wrapper, shown below
 
-const app = createApp(App);
-
-app.use(router).mount("#app");
+createApp(App)
+  .use(createRouter({ history: createWebHistory(), routes }))
+  .mount("#app");
