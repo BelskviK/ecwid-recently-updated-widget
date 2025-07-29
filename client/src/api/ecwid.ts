@@ -17,15 +17,25 @@ export interface EcwidProduct {
 }
 
 /** All products (for /products page) */
-export async function fetchAllProducts(): Promise<EcwidProduct[]> {
-  const { data } = await api.get("/api/products", { params: { limit: 100 } });
-  return data.items as EcwidProduct[];
-}
-
-/** N most-recently updated products (for widget) */
 export async function fetchRecentlyUpdated(limit = 6): Promise<EcwidProduct[]> {
   const { data } = await api.get("/api/products", {
-    params: { limit, sortBy: "updateDateDesc" },
+    params: { limit, sortBy: "UPDATED_TIME_DESC" },
   });
-  return data.items as EcwidProduct[];
+
+  const currency = data.currency; // <-- store-wide currency comes from top level
+  return (data.items as EcwidProduct[]).map((p) => ({
+    ...p,
+    currency, // inject currency so the widget can format
+  }));
+}
+
+/** All products (optional — same fix if you need currency elsewhere) */
+export async function fetchAllProducts(): Promise<EcwidProduct[]> {
+  const { data } = await api.get("/api/products", { params: { limit: 100 } });
+
+  const currency = data.currency;
+  return (data.items as EcwidProduct[]).map((p) => ({
+    ...p,
+    currency,
+  }));
 }

@@ -2235,7 +2235,7 @@ vue-router@^4.3.0:
   dependencies:
     "@vue/devtools-api" "^6.6.4"
 
-vue@^3.5.0:
+vue@3:
   version "3.5.18"
   resolved "https://registry.yarnpkg.com/vue/-/vue-3.5.18.tgz#3d622425ad1391a2b0138323211ec784f4415686"
   integrity sha512-7W4Y4ZbMiQ3SEo+m9lnoNpV9xG7QVMLa+/0RFwwiAVkeYoyGXqWE85jabU4pllJNUzqfLShJ5YLptewhCWUgNA==

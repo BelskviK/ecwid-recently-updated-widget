@@ -50,7 +50,7 @@
 <script setup lang="ts">
 import { ref, onMounted, watch } from "vue";
 import { fetchRecentlyUpdated, EcwidProduct } from "@/api/ecwid";
-
+import { useCart } from "@/stores/cart";
 const count = ref(Number(localStorage.getItem("ru-count")) || 6);
 const products = ref<EcwidProduct[]>([]);
 const loading = ref(false);
@@ -76,20 +76,27 @@ async function load() {
 }
 
 function addToCart(p: EcwidProduct) {
-  window.Ecwid?.Cart.addProduct(
-    p.id,
-    1,
-    null,
-    [{ name: "FROM_RUP", value: "1", hidden: true }],
-    () => window.Ecwid.openPage("cart")
-  );
+  // if Ecwid JS is available, use it, otherwise fallback to local store
+  if (window.Ecwid?.Cart) {
+    window.Ecwid.Cart.addProduct(
+      p.id,
+      1,
+      null,
+      [{ name: "FROM_RUP", value: "1", hidden: true }],
+      () => window.Ecwid.openPage("cart")
+    );
+  } else {
+    useCart().add(p);
+  }
 }
-
 const openProduct = (p: EcwidProduct) =>
   window.Ecwid?.openPage(`product/${p.id}`);
 
-const formatPrice = (price: number, currency: string) =>
-  new Intl.NumberFormat(undefined, { style: "currency", currency }).format(
-    price
-  );
+/** Safe formatter: if currency missing, just show raw price */
+const formatPrice = (price: number, currency?: string) =>
+  currency
+    ? new Intl.NumberFormat(undefined, { style: "currency", currency }).format(
+        price
+      )
+    : price.toFixed(2);
 </script>
