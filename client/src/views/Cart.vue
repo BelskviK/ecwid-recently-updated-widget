@@ -14,7 +14,7 @@
           <img
             :src="it.thumbnailUrl"
             :alt="it.name"
-            class="w-24 h-24 rounded-lg object-cover mr-4"
+            class="w-20 h-20 rounded-lg object-cover mr-4"
           />
 
           <div class="flex-grow">
